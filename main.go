@@ -1,45 +1,26 @@
 package main
 
 import (
-	"net/url"
-
 	"fmt"
 	"log"
 	"net/http"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
-	"github.com/Lyca0n/wsui/model"
 	"github.com/Lyca0n/wsui/widgets"
-
 	"github.com/gorilla/websocket"
 )
 
-var connList []model.Bookmark = []model.Bookmark{
-	{Name: "Home", Url: url.URL{Scheme: "ws", Host: "localhost", Path: ""}},
-	{Name: "Store 0020", Url: url.URL{Scheme: "ws", Host: "192.168.0.120", Path: ""}},
-	{Name: "Home", Url: url.URL{Scheme: "ws", Host: "localhost", Path: ""}},
-	{Name: "Store 0020", Url: url.URL{Scheme: "ws", Host: "192.168.0.120", Path: ""}},
-	{Name: "Home", Url: url.URL{Scheme: "ws", Host: "localhost", Path: ""}},
-	{Name: "Store 0020", Url: url.URL{Scheme: "ws", Host: "192.168.0.120", Path: ""}},
-	{Name: "Store 0020", Url: url.URL{Scheme: "ws", Host: "192.168.0.120", Path: ""}},
-}
-
 func main() {
 	//To be removed
-	go LanuchServer()
-	connectionWidget := widgets.ConnectionWidget{}
-	messages := widgets.MessageWidget{}
+	//go LanuchServer()
+	u := &widgets.WSUI{}
 	a := app.New()
 	w := a.NewWindow("WSUI")
 	w.Resize(fyne.NewSize(960, 660))
-	w.SetContent(
-		container.NewGridWithColumns(3, connectionWidget.MakeConnectionWidget(connList), messages.MakeMessageWidget()),
-	)
+	w.SetContent(u.MakeUI())
 	w.ShowAndRun()
 
-	messages.NewMessage("hello bro")
 }
 
 //server stuff
