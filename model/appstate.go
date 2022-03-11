@@ -9,13 +9,14 @@ import (
 type AppState struct {
 	ConnectionList []Bookmark
 	Messages       []string
-	Connection     websocket.Conn
+	Connection     *websocket.Conn
+	SelectedServer *Bookmark
 }
 
 func InitAppState() *AppState {
 	var initState = &AppState{}
 	initState.ConnectionList = []Bookmark{
-		{Name: "Home", Url: url.URL{Scheme: "ws", Host: "localhost", Path: ""}},
+		{Name: "Home", Url: url.URL{Scheme: "ws", Host: "localhost:9090", Path: "/socket"}},
 		{Name: "Store 0020", Url: url.URL{Scheme: "ws", Host: "192.168.0.120", Path: ""}},
 		{Name: "Home", Url: url.URL{Scheme: "ws", Host: "localhost", Path: ""}},
 		{Name: "Store 0020", Url: url.URL{Scheme: "ws", Host: "192.168.0.120", Path: ""}},
@@ -34,3 +35,5 @@ func InitAppState() *AppState {
 
 	return initState
 }
+
+func (a *AppState) SelectServer() {}

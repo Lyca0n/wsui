@@ -13,7 +13,7 @@ import (
 
 func main() {
 	//To be removed
-	//go LanuchServer()
+	go LanuchServer()
 	u := &widgets.WSUI{}
 	a := app.New()
 	w := a.NewWindow("WSUI")
@@ -39,7 +39,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer conn.Close()
-
+	conn.WriteMessage(1, []byte("Welcome"))
 	// The event loop
 	for {
 		messageType, message, err := conn.ReadMessage()
