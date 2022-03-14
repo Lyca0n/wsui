@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"reflect"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -26,6 +27,21 @@ type WSUI struct {
 	connectionDisplay []model.Bookmark
 	messageEntry      *widget.Entry
 	sendButton        *widget.Button
+	optionsForm       *widget.Form
+}
+
+func getOpsFormItems(options *model.Options) []*widget.FormItem {
+	var formItems = []*widget.FormItem{}
+	val := reflect.Indirect(reflect.ValueOf(options))
+	for i := 0; i < val.Type().NumField(); i++ {
+		// skips fields without json tag
+		if tag, ok := val.Type().Field(i).Tag.Lookup("json"); ok {
+			fmt.Println("Afield " + tag)
+			formItems = append(formItems, &widget.FormItem{
+				Text: tag, Widget: widget.NewEntry()})
+		}
+	}
+	return formItems
 }
 
 func (ui *WSUI) MakeUI() fyne.CanvasObject {
@@ -58,9 +74,18 @@ func (ui *WSUI) MakeUI() fyne.CanvasObject {
 	ui.sendButton = widget.NewButton("Send", func() {
 		ui.sendHandler(ui.messageEntry.Text)
 	})
+
+	ui.optionsForm = &widget.Form{
+		Items: getOpsFormItems(ui.appState.AppOptions),
+		OnSubmit: func() { // optional, handle form submission
+			log.Println("Form submitted")
+
+		},
+	}
 	return container.NewGridWithColumns(3,
 		container.NewBorder(container.NewVBox(widget.NewLabel("Connection Bookmarks"), ui.filter), ui.connectButton, nil, nil, container.NewScroll(ui.connectionList)),
 		container.NewBorder(container.NewVBox(widget.NewLabel("Messages")), nil, nil, nil, container.NewVSplit(ui.messageScoll, container.NewBorder(nil, ui.sendButton, nil, nil, ui.messageEntry))),
+		container.NewBorder(container.NewVBox(widget.NewLabel("Options")), nil, nil, nil, ui.optionsForm),
 	)
 
 }
@@ -121,10 +146,9 @@ func (ui *WSUI) handleConnect() {
 	conn, _, err := websocket.DefaultDialer.Dial(ui.appState.SelectedServer.Url.String(), nil)
 
 	if err != nil {
-		log.Fatal("Error connecting to Websocket Server:", err)
+		log.Print("Error connecting to Websocket Server:", err)
+	} else {
+		ui.appState.Connection = conn
+		go ui.receiveHandler(ui.appState.Connection)
 	}
-
-	ui.appState.Connection = conn
-	go ui.receiveHandler(ui.appState.Connection)
-
 }

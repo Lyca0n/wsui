@@ -11,6 +11,7 @@ type AppState struct {
 	Messages       []string
 	Connection     *websocket.Conn
 	SelectedServer *Bookmark
+	AppOptions     *Options
 }
 
 func InitAppState() *AppState {
@@ -18,20 +19,9 @@ func InitAppState() *AppState {
 	initState.ConnectionList = []Bookmark{
 		{Name: "Home", Url: url.URL{Scheme: "ws", Host: "localhost:9090", Path: "/socket"}},
 		{Name: "Store 0020", Url: url.URL{Scheme: "ws", Host: "192.168.0.120", Path: ""}},
-		{Name: "Home", Url: url.URL{Scheme: "ws", Host: "localhost", Path: ""}},
-		{Name: "Store 0020", Url: url.URL{Scheme: "ws", Host: "192.168.0.120", Path: ""}},
-		{Name: "Home", Url: url.URL{Scheme: "ws", Host: "localhost", Path: ""}},
-		{Name: "Store 0020", Url: url.URL{Scheme: "ws", Host: "192.168.0.120", Path: ""}},
-		{Name: "Store 0020", Url: url.URL{Scheme: "ws", Host: "192.168.0.120", Path: ""}},
 	}
-	initState.Messages = []string{`{
-		"str": "foo",
-		"num": 100,
-		"bool": false,
-		"null": null,
-		"array": ["foo", "bar", "baz"],
-		"obj": { "a": 1, "b": 2 }
-	}`}
+	initState.Messages = []string{}
+	initState.AppOptions = DefaultOpts()
 
 	return initState
 }
