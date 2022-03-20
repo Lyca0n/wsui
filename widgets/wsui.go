@@ -60,6 +60,7 @@ func (ui *WSUI) MakeUI() fyne.CanvasObject {
 	ui.connectionList.OnSelected = func(id widget.ListItemID) {
 		fmt.Println("Selected one")
 		ui.appState.SelectedServer = &ui.connectionDisplay[id]
+		ui.connectButton.Enable()
 	}
 	ui.messageContainer = container.NewVBox(widget.NewLabel("hello this is  a new message"))
 	ui.messageScoll = container.NewScroll(ui.messageContainer)
@@ -70,7 +71,7 @@ func (ui *WSUI) MakeUI() fyne.CanvasObject {
 	ui.connectButton = widget.NewButton("Connect", func() {
 		ui.handleConnect()
 	})
-
+	ui.connectButton.Disable()
 	ui.sendButton = widget.NewButton("Send", func() {
 		ui.sendHandler(ui.messageEntry.Text)
 	})
@@ -107,8 +108,12 @@ func (ui *WSUI) receiveHandler(connection *websocket.Conn) {
 	defer ui.appState.Connection.Close()
 	for {
 		_, msg, err := connection.ReadMessage()
+		if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
+			ui.handleReconnect()
+		}
 		if err != nil {
 			log.Println("Error in receive:", err)
+
 			return
 		}
 		log.Printf("Received: %s\n", msg)
@@ -150,5 +155,31 @@ func (ui *WSUI) handleConnect() {
 	} else {
 		ui.appState.Connection = conn
 		go ui.receiveHandler(ui.appState.Connection)
+
+		ui.connectButton.Text = "Disconnect"
+		ui.connectButton.OnTapped = func() {
+			ui.handleDisconnect()
+		}
+		ui.connectButton.Refresh()
 	}
+}
+
+func (ui *WSUI) handleDisconnect() {
+
+	ui.appState.Connection.Close()
+	ui.connectButton.Text = "Connect"
+	ui.connectButton.OnTapped = func() {
+		ui.handleConnect()
+	}
+	ui.connectButton.Refresh()
+}
+
+func (ui *WSUI) handleReconnect() {
+
+	ui.appState.Connection.Close()
+	ui.connectButton.Text = "Reconnect"
+	ui.connectButton.OnTapped = func() {
+		ui.handleConnect()
+	}
+	ui.connectButton.Refresh()
 }
