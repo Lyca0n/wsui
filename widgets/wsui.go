@@ -75,7 +75,7 @@ func (ui *WSUI) MakeUI() fyne.CanvasObject {
 	ui.sendButton = widget.NewButton("Send", func() {
 		ui.sendHandler(ui.messageEntry.Text)
 	})
-
+	ui.sendButton.Disable()
 	ui.optionsForm = &widget.Form{
 		Items: getOpsFormItems(ui.appState.AppOptions),
 		OnSubmit: func() { // optional, handle form submission
@@ -83,6 +83,8 @@ func (ui *WSUI) MakeUI() fyne.CanvasObject {
 
 		},
 	}
+	ui.optionsForm.SubmitText = "Set Configuration"
+
 	return container.NewGridWithColumns(3,
 		container.NewBorder(container.NewVBox(widget.NewLabel("Connection Bookmarks"), ui.filter), ui.connectButton, nil, nil, container.NewScroll(ui.connectionList)),
 		container.NewBorder(container.NewVBox(widget.NewLabel("Messages")), nil, nil, nil, container.NewVSplit(ui.messageScoll, container.NewBorder(nil, ui.sendButton, nil, nil, ui.messageEntry))),
@@ -161,6 +163,8 @@ func (ui *WSUI) handleConnect() {
 			ui.handleDisconnect()
 		}
 		ui.connectButton.Refresh()
+		ui.sendButton.Enable()
+		ui.optionsForm.Disable()
 	}
 }
 
@@ -172,6 +176,8 @@ func (ui *WSUI) handleDisconnect() {
 		ui.handleConnect()
 	}
 	ui.connectButton.Refresh()
+	ui.sendButton.Disable()
+	ui.optionsForm.Enable()
 }
 
 func (ui *WSUI) handleReconnect() {
