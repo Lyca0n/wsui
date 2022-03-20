@@ -137,6 +137,7 @@ func (ui *WSUI) sendHandler(message string) {
 	ui.appState.Messages = append(ui.appState.Messages, string(message))
 	messageLabel := widget.NewLabel("You : \n" + string(message))
 	ui.appendMessage(messageLabel)
+	ui.messageEntry.SetText("")
 }
 
 func (ui *WSUI) appendMessage(newMessage *widget.Label) {
