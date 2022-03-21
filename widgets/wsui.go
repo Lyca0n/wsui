@@ -58,7 +58,6 @@ func (ui *WSUI) MakeUI() fyne.CanvasObject {
 			o.(*widget.Label).SetText(ui.connectionDisplay[i].String())
 		})
 	ui.connectionList.OnSelected = func(id widget.ListItemID) {
-		fmt.Println("Selected one")
 		ui.appState.SelectedServer = &ui.connectionDisplay[id]
 		ui.connectButton.Enable()
 	}
@@ -94,10 +93,8 @@ func (ui *WSUI) MakeUI() fyne.CanvasObject {
 }
 
 func (ui *WSUI) SearchConnections(term string) {
-	fmt.Print("changed " + term + "\n")
 	if term != "" {
 		ui.connectionDisplay = model.FilterByTerm(term, ui.appState.ConnectionList)
-		fmt.Printf("length %d \n", len(ui.appState.ConnectionList))
 	} else {
 		ui.connectionDisplay = ui.appState.ConnectionList
 	}
