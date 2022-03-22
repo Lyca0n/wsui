@@ -11,6 +11,6 @@ func main() {
 	a := app.New()
 	w := a.NewWindow("WSUI")
 	w.Resize(fyne.NewSize(960, 660))
-	w.SetContent(u.MakeUI())
+	w.SetContent(u.MakeUI(&w))
 	w.ShowAndRun()
 }

@@ -11,6 +11,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/Lyca0n/wsui/model"
+	"github.com/Lyca0n/wsui/util"
 	"github.com/gorilla/websocket"
 )
 
@@ -28,6 +29,9 @@ type WSUI struct {
 	messageEntry      *widget.Entry
 	sendButton        *widget.Button
 	optionsForm       *widget.Form
+	newConnButton     *widget.Button
+	newConnForm       *BookmarkForm
+	newConnModal      *widget.PopUp
 }
 
 func getOpsFormItems(options *model.Options) []*widget.FormItem {
@@ -44,7 +48,7 @@ func getOpsFormItems(options *model.Options) []*widget.FormItem {
 	return formItems
 }
 
-func (ui *WSUI) MakeUI() fyne.CanvasObject {
+func (ui *WSUI) MakeUI(win *fyne.Window) fyne.CanvasObject {
 	ui.appState = model.InitAppState()
 	ui.connectionDisplay = ui.appState.ConnectionList
 	ui.connectionList = widget.NewList(
@@ -57,11 +61,14 @@ func (ui *WSUI) MakeUI() fyne.CanvasObject {
 		func(i int, o fyne.CanvasObject) {
 			o.(*widget.Label).SetText(ui.connectionDisplay[i].String())
 		})
+	ui.newConnButton = widget.NewButton("+", func() {
+		ui.newConnModal.Show()
+	})
 	ui.connectionList.OnSelected = func(id widget.ListItemID) {
 		ui.appState.SelectedServer = &ui.connectionDisplay[id]
 		ui.connectButton.Enable()
 	}
-	ui.messageContainer = container.NewVBox(widget.NewLabel("hello this is  a new message"))
+	ui.messageContainer = container.NewVBox()
 	ui.messageScoll = container.NewScroll(ui.messageContainer)
 	ui.messageEntry = widget.NewEntry()
 
@@ -84,12 +91,24 @@ func (ui *WSUI) MakeUI() fyne.CanvasObject {
 	}
 	ui.optionsForm.SubmitText = "Set Configuration"
 
+	//bookmark Modal
+	ui.newConnForm = &BookmarkForm{}
+	ui.newConnModal = widget.NewModalPopUp(ui.newConnForm.Init(ui), (*win).Canvas())
+	ui.newConnModal.Resize(fyne.NewSize(320, 280))
 	return container.NewGridWithColumns(3,
-		container.NewBorder(container.NewVBox(widget.NewLabel("Connection Bookmarks"), ui.filter), ui.connectButton, nil, nil, container.NewScroll(ui.connectionList)),
+		container.NewBorder(container.NewVBox(container.NewHBox(widget.NewLabel("Connection Bookmarks"), ui.newConnButton), ui.filter), ui.connectButton, nil, nil, container.NewScroll(ui.connectionList)),
 		container.NewBorder(container.NewVBox(widget.NewLabel("Messages")), nil, nil, nil, container.NewVSplit(ui.messageScoll, container.NewBorder(nil, ui.sendButton, nil, nil, ui.messageEntry))),
 		container.NewBorder(container.NewVBox(widget.NewLabel("Options")), nil, nil, nil, ui.optionsForm),
 	)
 
+}
+
+func (ui *WSUI) AppendBookmark(bookmark model.Bookmark) {
+	ui.appState.ConnectionList = append(ui.appState.ConnectionList, bookmark)
+	ui.connectionDisplay = ui.appState.ConnectionList
+	ui.connectionList.Refresh()
+	ui.newConnModal.Hide()
+	util.UnloadBookmarks(ui.appState.ConnectionList)
 }
 
 func (ui *WSUI) SearchConnections(term string) {
