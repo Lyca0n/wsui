@@ -26,7 +26,7 @@ func (bf *BookmarkForm) Reset() {
 	bf.path.Text = ""
 }
 
-func (bf *BookmarkForm) Init(ui *WSUI) *widget.Form {
+func (bf *BookmarkForm) Init(callback func(model.Bookmark)) *widget.Form {
 
 	bf.name = widget.NewEntry()
 	bf.scheme = widget.NewEntry()
@@ -41,7 +41,7 @@ func (bf *BookmarkForm) Init(ui *WSUI) *widget.Form {
 			{Text: "Path", Widget: bf.path},
 		},
 		OnSubmit: func() {
-			ui.AppendBookmark(model.Bookmark{
+			callback(model.Bookmark{
 				Url:  url.URL{Scheme: bf.scheme.Text, Host: bf.hostname.Text, Path: bf.path.Text},
 				Name: bf.name.Text,
 			})
