@@ -34,6 +34,7 @@ type WSUI struct {
 	newConnButton     *widget.Button
 	newConnForm       *BookmarkForm
 	newConnModal      *widget.PopUp
+	alertPopup        *Alert
 }
 
 func (ui *WSUI) MakeUI(win *fyne.Window, storedBookmarks []model.Bookmark) fyne.CanvasObject {
@@ -77,6 +78,9 @@ func (ui *WSUI) MakeUI(win *fyne.Window, storedBookmarks []model.Bookmark) fyne.
 	ui.newConnForm = &BookmarkForm{}
 	ui.newConnModal = widget.NewModalPopUp(ui.newConnForm.Init(ui.AppendBookmark), (*win).Canvas())
 	ui.newConnModal.Resize(fyne.NewSize(320, 280))
+
+	ui.alertPopup = &Alert{}
+	ui.alertPopup.makeAlert(win)
 	return container.NewGridWithColumns(3,
 		container.NewBorder(container.NewVBox(container.NewHBox(widget.NewLabel("Connection Bookmarks"), ui.newConnButton), ui.filter), ui.connectButton, nil, nil, container.NewScroll(ui.connectionList)),
 		container.NewBorder(container.NewVBox(widget.NewLabel("Messages")), nil, nil, nil, container.NewVSplit(ui.messageScoll, container.NewBorder(nil, ui.sendButton, nil, nil, ui.messageEntry))),
@@ -168,6 +172,7 @@ func (ui *WSUI) handleConnect() {
 	conn, _, err := websocket.DefaultDialer.Dial(ui.appState.SelectedServer.Url.String(), headers)
 
 	if err != nil {
+		ui.alertPopup.Alert(err.Error())
 		log.Print("Error connecting to Websocket Server:", err)
 	} else {
 		ui.appState.Connection = conn
