@@ -2,23 +2,32 @@ package util
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/Lyca0n/wsui/model"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
-	LINUX_BOOKMARK_FILE = "./bookmarks.json"
-	LINUX_BOOKMARK_DIR  = "./"
+	LINUX_BOOKMARK_FILE = "wsui.json"
 )
+
+func GetUserFilePath() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatalf("obtaining user home directory")
+	}
+	return filepath.Join(home, LINUX_BOOKMARK_FILE)
+}
 
 func LoadBookmarks() []model.Bookmark {
 	books := []model.Bookmark{}
-	content, err := ioutil.ReadFile(LINUX_BOOKMARK_FILE)
+	content, err := ioutil.ReadFile(GetUserFilePath())
 	if err != nil {
-		fmt.Print("Error when opening file: ", err)
+		log.Debug(err)
+		log.Info("no configuration file found, attempting to create one ")
 	}
 
 	json.Unmarshal(content, &books)
@@ -26,20 +35,20 @@ func LoadBookmarks() []model.Bookmark {
 }
 
 func UnloadBookmarks(books []model.Bookmark) {
-	empty, err := os.Create(LINUX_BOOKMARK_FILE)
+	empty, err := os.Create(GetUserFilePath())
 	if err != nil {
-		fmt.Print("Error creating file")
+		log.Debugf("creating file")
 	} else {
 		empty.Close()
 	}
 
 	literalBooks, err := json.MarshalIndent(books, "", " ")
 	if err != nil {
-		fmt.Print("Unrecoverable Error Writing bookmarks")
+		log.Fatalf("writing bookmarks")
 	}
-	fmt.Print(literalBooks)
-	if err := os.WriteFile(LINUX_BOOKMARK_FILE, literalBooks, 0644); err != nil {
-		fmt.Print("Write Error ", err)
+	log.Debug(literalBooks)
+	if err := os.WriteFile(GetUserFilePath(), literalBooks, 0644); err != nil {
+		log.Fatalf("writing file ", err)
 	}
 
 }

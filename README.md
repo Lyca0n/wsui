@@ -2,7 +2,7 @@
 
 ## Features 
 1. Prompt reconnect upon server temrinating connection
-2. Bookmard menu tu list connections
+2. Bookmark menu to list connections
 
 ## Build sources 
 Download dependencies 
