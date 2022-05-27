@@ -20,6 +20,8 @@ jobs:
       run: sudo apt-get install -y libxinerama-dev
     - name: Install libxi-dev
       run: sudo apt-get install -y libxi-dev
+    - name: Install libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev
+      run: sudo apt-get install libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
