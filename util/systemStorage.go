@@ -37,18 +37,18 @@ func LoadBookmarks() []model.Bookmark {
 func UnloadBookmarks(books []model.Bookmark) {
 	empty, err := os.Create(GetUserFilePath())
 	if err != nil {
-		log.Debugf("creating file")
+		log.Debug("creating file")
 	} else {
 		empty.Close()
 	}
 
 	literalBooks, err := json.MarshalIndent(books, "", " ")
 	if err != nil {
-		log.Fatalf("writing bookmarks")
+		log.Fatal("writing bookmarks")
 	}
 	log.Debug(literalBooks)
 	if err := os.WriteFile(GetUserFilePath(), literalBooks, 0644); err != nil {
-		log.Fatalf("writing file ", err)
+		log.Fatal("writing file ", err)
 	}
 
 }
