@@ -12,3 +12,6 @@ Download dependencies
 Build binary
 
 `go build` || `go build -o wsui.x`
+
+## Example
+![alt text](https://github.com/Lyca0n/wsui/blob/main/docs/Capture.png?raw=true)
