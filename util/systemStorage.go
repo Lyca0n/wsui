@@ -17,7 +17,7 @@ var (
 func GetUserFilePath() string {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatalf("obtaining user home directory")
+		log.Fatal("obtaining user home directory")
 	}
 	return filepath.Join(home, LINUX_BOOKMARK_FILE)
 }
