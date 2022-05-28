@@ -28,7 +28,7 @@ type WSUI struct {
 	filter            *widget.Entry
 	connectButton     *widget.Button
 	connectionDisplay []model.Bookmark
-	messageEntry      *widget.Entry
+	messageEntry      *HistoryEntry
 	sendButton        *widget.Button
 	optionsForm       *ConnOptionsForm
 	newConnButton     *widget.Button
@@ -60,8 +60,7 @@ func (ui *WSUI) MakeUI(win *fyne.Window, storedBookmarks []model.Bookmark) fyne.
 	}
 	ui.messageContainer = container.NewVBox()
 	ui.messageScoll = container.NewScroll(ui.messageContainer)
-	ui.messageEntry = widget.NewEntry()
-
+	ui.messageEntry = NewHistoryEntry()
 	ui.filter = widget.NewEntry()
 	ui.filter.OnChanged = ui.SearchConnections
 	ui.connectButton = widget.NewButton("Connect", func() {
@@ -153,7 +152,7 @@ func (ui *WSUI) sendHandler(message string) {
 	ui.appState.Messages = append(ui.appState.Messages, string(message))
 	messageLabel := widget.NewLabel("You : \n" + string(message))
 	ui.appendMessage(messageLabel)
-	ui.messageEntry.SetText("")
+	ui.messageEntry.Clear()
 }
 
 func (ui *WSUI) appendMessage(newMessage *widget.Label) {
