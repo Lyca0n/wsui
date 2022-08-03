@@ -31,10 +31,7 @@ jobs:
       with:
         version: latest
         platform: x64      
-      if: ${{ runner.os == 'Linux' }}
-        
-    - name: Test
-      run: go test -v ./...  
+      if: ${{ runner.os == 'Linux' }} 
       
     - name: Release
       uses: wangyoucao577/go-release-action@v1.4
