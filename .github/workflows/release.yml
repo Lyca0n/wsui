@@ -6,8 +6,8 @@ on:
 
 jobs:
   release-linux-amd64:
-    name: release linux/amd64
-    runs-on: fedora-latest
+    name: release wsui bin
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         # build and publish in parallel: linux/amd64, windows/amd64
@@ -15,8 +15,10 @@ jobs:
         goarch: [amd64] 
     steps:
     - uses: actions/checkout@v2
-    - uses: wangyoucao577/go-release-action@v1.25
+    - uses: wangyoucao577/go-release-action@v1.3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         goos: ${{ matrix.goos }}
         goarch: ${{ matrix.goarch }}
+        goversion: "https://dl.google.com/go/go1.18.1.linux-amd64.tar.gz"
+        pre_command: "go get -v -t -d ./... "        
