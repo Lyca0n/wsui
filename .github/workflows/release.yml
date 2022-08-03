@@ -21,6 +21,11 @@ jobs:
       run: sudo apt-get install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev libxxf86vm-dev
       if: ${{ runner.os == 'Linux' }}
       
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.18      
+      
     - name: Set up GCC
       uses: egor-tensin/setup-gcc@v1      
       with:
