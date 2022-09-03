@@ -1,8 +1,6 @@
 package widgets
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -32,6 +30,7 @@ type WSUI struct {
 	sendButton        *widget.Button
 	optionsForm       *ConnOptionsForm
 	newConnButton     *widget.Button
+	delConnButton     *widget.Button
 	newConnForm       *BookmarkForm
 	newConnModal      *widget.PopUp
 	alertPopup        *Alert
@@ -54,9 +53,16 @@ func (ui *WSUI) MakeUI(win *fyne.Window, storedBookmarks []model.Bookmark) fyne.
 	ui.newConnButton = widget.NewButton("+", func() {
 		ui.newConnModal.Show()
 	})
+
+	ui.delConnButton = widget.NewButton("-", func() {
+		ui.DeleteActiveBookmark()
+	})
+	ui.delConnButton.Disable()
+
 	ui.connectionList.OnSelected = func(id widget.ListItemID) {
 		ui.appState.SelectedServer = &ui.connectionDisplay[id]
 		ui.connectButton.Enable()
+		ui.delConnButton.Enable()
 	}
 	ui.messageContainer = container.NewVBox()
 	ui.messageScoll = container.NewScroll(ui.messageContainer)
@@ -81,7 +87,7 @@ func (ui *WSUI) MakeUI(win *fyne.Window, storedBookmarks []model.Bookmark) fyne.
 	ui.alertPopup = &Alert{}
 	ui.alertPopup.makeAlert(win)
 	return container.NewGridWithColumns(3,
-		container.NewBorder(container.NewVBox(container.NewHBox(widget.NewLabel("Connection Bookmarks"), ui.newConnButton), ui.filter), ui.connectButton, nil, nil, container.NewScroll(ui.connectionList)),
+		container.NewBorder(container.NewVBox(container.NewHBox(widget.NewLabel("Connection Bookmarks"), ui.newConnButton, ui.delConnButton), ui.filter), ui.connectButton, nil, nil, container.NewScroll(ui.connectionList)),
 		container.NewBorder(container.NewVBox(widget.NewLabel("Messages")), nil, nil, nil, container.NewVSplit(ui.messageScoll, container.NewBorder(nil, ui.sendButton, nil, nil, ui.messageEntry))),
 		container.NewBorder(container.NewVBox(widget.NewLabel("Options")), nil, nil, nil, ui.optionsForm.Init(ui.setOptions)),
 	)
@@ -98,6 +104,21 @@ func (ui *WSUI) AppendBookmark(bookmark model.Bookmark) {
 	ui.connectionDisplay = ui.appState.ConnectionList
 	ui.connectionList.Refresh()
 	ui.newConnModal.Hide()
+	util.UnloadBookmarks(ui.appState.ConnectionList)
+}
+
+func (ui *WSUI) DeleteActiveBookmark() {
+	fmt.Print("deleting")
+	name := ui.appState.SelectedServer.Name
+	var filtered []model.Bookmark
+	for i := range ui.appState.ConnectionList {
+		if ui.appState.ConnectionList[i].Name != name {
+			filtered = append(filtered, ui.appState.ConnectionList[i])
+		}
+	}
+	ui.appState.ConnectionList = filtered
+	ui.connectionDisplay = ui.appState.ConnectionList
+	ui.connectionList.Refresh()
 	util.UnloadBookmarks(ui.appState.ConnectionList)
 }
 
@@ -126,17 +147,16 @@ func (ui *WSUI) receiveHandler(connection *websocket.Conn) {
 		}
 		log.Printf("Received: %s\n", msg)
 
+		msgStr := ""
 		if ui.appState.AppOptions.ConsumeAs == MEDIA_OPTS[1] {
-			var formatted bytes.Buffer
-			if err = json.Indent(&formatted, msg, "\t", "  "); err == nil {
-				msg = formatted.Bytes()
-			} else {
-				fmt.Print("attempted to format message but failed")
-			}
+
+			msgStr = util.FormatJson(msg)
+		} else {
+			msgStr = util.FormatDefault(msg)
 		}
-		ui.appState.Messages = append(ui.appState.Messages, string(msg))
+		ui.appState.Messages = append(ui.appState.Messages, msgStr)
 		who := ui.appState.Connection.RemoteAddr()
-		messageLabel := widget.NewLabel(who.String() + " : \n" + string(msg))
+		messageLabel := widget.NewLabel(who.String() + " : \n" + msgStr)
 		ui.appendMessage(messageLabel)
 	}
 }
