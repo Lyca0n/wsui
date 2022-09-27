@@ -147,18 +147,24 @@ func (ui *WSUI) receiveHandler(connection *websocket.Conn) {
 		}
 		log.Printf("Received: %s\n", msg)
 
-		msgStr := ""
-		if ui.appState.AppOptions.ConsumeAs == MEDIA_OPTS[1] {
-
-			msgStr = util.FormatJson(msg)
-		} else {
-			msgStr = util.FormatDefault(msg)
-		}
-		ui.appState.Messages = append(ui.appState.Messages, msgStr)
+		msgStr := ui.formatMessage(msg)
+		ui.appState.Messages = append(ui.appState.Messages, ui.formatMessage(msg))
 		who := ui.appState.Connection.RemoteAddr()
 		messageLabel := widget.NewLabel(who.String() + " : \n" + msgStr)
 		ui.appendMessage(messageLabel)
 	}
+}
+
+func (ui *WSUI) formatMessage(msg []byte) string {
+	msgStr := ""
+	if ui.appState.AppOptions.ConsumeAs == MEDIA_OPTS[1] {
+
+		msgStr = util.FormatJson(msg)
+	} else {
+		msgStr = util.FormatDefault(msg)
+	}
+
+	return msgStr
 }
 
 func (ui *WSUI) sendHandler(message string) {
@@ -169,8 +175,9 @@ func (ui *WSUI) sendHandler(message string) {
 		return
 	}
 
-	ui.appState.Messages = append(ui.appState.Messages, string(message))
-	messageLabel := widget.NewLabel("You : \n" + string(message))
+	msgStr := ui.formatMessage([]byte(message))
+	ui.appState.Messages = append(ui.appState.Messages, string(msgStr))
+	messageLabel := widget.NewLabel("You : \n" + string(msgStr))
 	ui.appendMessage(messageLabel)
 	ui.messageEntry.Clear()
 }
