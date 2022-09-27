@@ -25,4 +25,7 @@ func (e *HistoryEntry) TypedKey(key *fyne.KeyEvent) {
 	if key.Name == fyne.KeyUp {
 		e.SetText(e.lastInput)
 	}
+	if key.Name == fyne.KeyBackspace {
+		e.SetText(e.Text[:len(e.Text)-1])
+	}
 }
