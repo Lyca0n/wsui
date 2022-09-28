@@ -13,6 +13,8 @@ type MessageInput struct {
 func NewMessageInput() *MessageInput {
 	entry := &MessageInput{}
 	entry.ExtendBaseWidget(entry)
+	entry.Wrapping = fyne.TextTruncate
+	entry.MultiLine = true
 	return entry
 }
 
