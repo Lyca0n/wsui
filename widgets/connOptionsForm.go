@@ -5,10 +5,6 @@ import (
 	"github.com/Lyca0n/wsui/model"
 )
 
-var (
-	MEDIA_OPTS = []string{"Text", "JSON"}
-)
-
 type ConnOptionsForm struct {
 	sendAs       *widget.Select
 	consumeAs    *widget.Select
@@ -17,8 +13,9 @@ type ConnOptionsForm struct {
 }
 
 func (cof *ConnOptionsForm) Init(callback func(model.Options)) *widget.Form {
-	cof.sendAs = widget.NewSelect(MEDIA_OPTS, func(s string) {})
-	cof.consumeAs = widget.NewSelect(MEDIA_OPTS, func(s string) {})
+	var opts = []string{model.JSON.String(), model.Text.String()}
+	cof.sendAs = widget.NewSelect(opts, func(s string) {})
+	cof.consumeAs = widget.NewSelect(opts, func(s string) {})
 	cof.originHeader = widget.NewEntry()
 	cof.form = &widget.Form{
 		Items: []*widget.FormItem{
@@ -28,8 +25,8 @@ func (cof *ConnOptionsForm) Init(callback func(model.Options)) *widget.Form {
 		},
 		OnSubmit: func() {
 			callback(model.Options{
-				SendAs:       cof.sendAs.Selected,
-				ConsumeAs:    cof.consumeAs.Selected,
+				SendAs:       model.ValueFromString(cof.sendAs.Selected),
+				ConsumeAs:    model.ValueFromString(cof.consumeAs.Selected),
 				OriginHeader: cof.originHeader.Text,
 			})
 		},

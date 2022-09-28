@@ -26,7 +26,7 @@ type WSUI struct {
 	filter            *widget.Entry
 	connectButton     *widget.Button
 	connectionDisplay []model.Bookmark
-	messageEntry      *HistoryEntry
+	messageEntry      *MessageInput
 	sendButton        *widget.Button
 	optionsForm       *ConnOptionsForm
 	newConnButton     *widget.Button
@@ -66,7 +66,7 @@ func (ui *WSUI) MakeUI(win *fyne.Window, storedBookmarks []model.Bookmark) fyne.
 	}
 	ui.messageContainer = container.NewVBox()
 	ui.messageScoll = container.NewScroll(ui.messageContainer)
-	ui.messageEntry = NewHistoryEntry()
+	ui.messageEntry = NewMessageInput()
 	ui.filter = widget.NewEntry()
 	ui.filter.OnChanged = ui.SearchConnections
 	ui.connectButton = widget.NewButton("Connect", func() {
@@ -157,7 +157,7 @@ func (ui *WSUI) receiveHandler(connection *websocket.Conn) {
 
 func (ui *WSUI) formatMessage(msg []byte) string {
 	msgStr := ""
-	if ui.appState.AppOptions.ConsumeAs == MEDIA_OPTS[1] {
+	if ui.appState.AppOptions.ConsumeAs == model.JSON {
 
 		msgStr = util.FormatJson(msg)
 	} else {

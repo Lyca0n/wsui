@@ -5,27 +5,30 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-type HistoryEntry struct {
+type MessageInput struct {
 	widget.Entry
 	lastInput string
 }
 
-func NewHistoryEntry() *HistoryEntry {
-	entry := &HistoryEntry{}
+func NewMessageInput() *MessageInput {
+	entry := &MessageInput{}
 	entry.ExtendBaseWidget(entry)
 	return entry
 }
 
-func (e *HistoryEntry) Clear() {
+func (e *MessageInput) Clear() {
 	e.lastInput = e.Text
 	e.SetText("")
 
 }
-func (e *HistoryEntry) TypedKey(key *fyne.KeyEvent) {
+func (e *MessageInput) TypedKey(key *fyne.KeyEvent) {
 	if key.Name == fyne.KeyUp {
 		e.SetText(e.lastInput)
 	}
 	if key.Name == fyne.KeyBackspace {
-		e.SetText(e.Text[:len(e.Text)-1])
+		if len(e.Text) > 0 {
+			e.SetText(e.Text[:len(e.Text)-1])
+		}
+
 	}
 }

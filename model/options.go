@@ -1,12 +1,32 @@
 package model
 
+import "sort"
+
 type Options struct {
-	OriginHeader string `json:"Origin-Header"`
-	SendAs       string `json:"Send-Content-As"`
-	ConsumeAs    string `json:"Get-Content-As"`
+	OriginHeader string         `json:"Origin-Header"`
+	SendAs       ContentOptions `json:"Send-Content-As"`
+	ConsumeAs    ContentOptions `json:"Get-Content-As"`
 }
 
 func DefaultOpts() *Options {
-	var ops = &Options{}
+	var ops = &Options{
+		ConsumeAs: JSON,
+		SendAs:    JSON,
+	}
 	return ops
+}
+
+type ContentOptions int8
+
+const (
+	JSON ContentOptions = iota
+	Text
+)
+
+func (c ContentOptions) String() string {
+	return [...]string{"Text", "JSON"}[c]
+}
+
+func ValueFromString(val string) ContentOptions {
+	return ContentOptions(sort.StringSlice([]string{"Text", "JSON"}).Search(val))
 }
