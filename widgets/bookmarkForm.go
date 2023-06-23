@@ -26,7 +26,7 @@ func (bf *BookmarkForm) Reset() {
 	bf.path.Text = ""
 }
 
-func (bf *BookmarkForm) Init(callback func(model.Bookmark)) *widget.Form {
+func (bf *BookmarkForm) Init(onSubmit func(model.Bookmark), onCancel func()) *widget.Form {
 
 	bf.name = widget.NewEntry()
 	bf.scheme = widget.NewEntry()
@@ -41,11 +41,15 @@ func (bf *BookmarkForm) Init(callback func(model.Bookmark)) *widget.Form {
 			{Text: "Path", Widget: bf.path},
 		},
 		OnSubmit: func() {
-			callback(model.Bookmark{
+			onSubmit(model.Bookmark{
 				Url:  url.URL{Scheme: bf.scheme.Text, Host: bf.hostname.Text, Path: bf.path.Text},
 				Name: bf.name.Text,
 			})
 			bf.Reset()
+		},
+		OnCancel: func() {
+			bf.Reset()
+			onCancel()
 		},
 	}
 

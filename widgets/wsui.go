@@ -81,17 +81,18 @@ func (ui *WSUI) MakeUI(win *fyne.Window, storedBookmarks []model.Bookmark) fyne.
 
 	//bookmark Modal
 	ui.newConnForm = &BookmarkForm{}
-	ui.newConnModal = widget.NewModalPopUp(ui.newConnForm.Init(ui.AppendBookmark), (*win).Canvas())
+	ui.newConnModal = widget.NewModalPopUp(ui.newConnForm.Init(ui.AppendBookmark, func() { ui.newConnModal.Hide() }), (*win).Canvas())
 	ui.newConnModal.Resize(fyne.NewSize(320, 280))
 
 	ui.alertPopup = &Alert{}
 	ui.alertPopup.makeAlert(win)
-	return container.NewGridWithColumns(3,
-		container.NewBorder(container.NewVBox(container.NewHBox(widget.NewLabel("Connection Bookmarks"), ui.newConnButton, ui.delConnButton), ui.filter), ui.connectButton, nil, nil, container.NewScroll(ui.connectionList)),
-		container.NewBorder(container.NewVBox(widget.NewLabel("Messages")), nil, nil, nil, container.NewVSplit(ui.messageScoll, container.NewBorder(nil, ui.sendButton, nil, nil, ui.messageEntry))),
-		container.NewBorder(container.NewVBox(widget.NewLabel("Options")), nil, nil, nil, ui.optionsForm.Init(ui.setOptions)),
+
+	tabs := container.NewAppTabs(
+		container.NewTabItem("Messages", container.NewVSplit(ui.messageScoll, container.NewBorder(nil, ui.sendButton, nil, nil, ui.messageEntry))),
+		container.NewTabItem("Options", ui.optionsForm.Init(ui.setOptions)),
 	)
 
+	return container.NewBorder(nil, nil, container.NewBorder(container.NewVBox(container.NewHBox(widget.NewLabel("Connection Bookmarks"), ui.newConnButton, ui.delConnButton), ui.filter), ui.connectButton, nil, nil, container.NewScroll(ui.connectionList)), nil, tabs)
 }
 
 func (ui *WSUI) setOptions(newOpts model.Options) {

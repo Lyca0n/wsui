@@ -1,6 +1,8 @@
 package widgets
 
 import (
+	"log"
+
 	"fyne.io/fyne/v2/widget"
 	"github.com/Lyca0n/wsui/model"
 )
@@ -24,6 +26,7 @@ func (cof *ConnOptionsForm) Init(callback func(model.Options)) *widget.Form {
 			{Text: "Origin Header", Widget: cof.originHeader},
 		},
 		OnSubmit: func() {
+			log.Println("choices change")
 			callback(model.Options{
 				SendAs:       model.ValueFromString(cof.sendAs.Selected),
 				ConsumeAs:    model.ValueFromString(cof.consumeAs.Selected),
