@@ -6,25 +6,17 @@ on:
 
 jobs:
   release-linux-amd64:
+    timeout-minutes: 20
     name: release wsui bin
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        # build and publish in parallel: linux/amd64, windows/amd64
-        goos: [linux, windows]
-        goarch: [amd64] 
+    
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    
+        
     - name: Install Deps
       run: sudo apt-get install libgl1-mesa-dev xorg-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev libxxf86vm-dev
       if: ${{ runner.os == 'Linux' }}
-      
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.18      
       
     - name: Set up GCC
       uses: egor-tensin/setup-gcc@v1      
@@ -33,11 +25,57 @@ jobs:
         platform: x64      
       if: ${{ runner.os == 'Linux' }} 
       
-    - name: Release
-      uses: wangyoucao577/go-release-action@v1.30
+    - name: Set up Go
+      uses: actions/setup-go@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        goos: ${{ matrix.goos }}
-        goarch: ${{ matrix.goarch }}
-        goversion: "https://dl.google.com/go/go1.18.1.linux-amd64.tar.gz"
-        binary_name: "wsui"
+        go-version: '1.20.1'
+        
+    - name: Install FyneCLi tool
+      run: go install fyne.io/fyne/v2/cmd/fyne@latest
+      
+    - name: Build
+      run: make build-linux
+
+    - name: Rename archive
+      run: mv bin/wsui.tar.xz bin/wsui_linux.tar.xz   
+      
+    - name: Upload Linux Bin
+      uses: djn24/add-asset-to-release@v1
+      with:
+        token: ${{secrets.GITHUB_TOKEN}}
+        path: 'bin/wsui_linux.tar.xz'
+ 
+ 
+  publish-binaries-win:
+    timeout-minutes: 20
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20.1'        
+      
+      - name: Set up MinGW
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
+
+      - name: Install FyneCLi tool
+        run: go install fyne.io/fyne/v2/cmd/fyne@latest
+
+      - name: Build
+        run: make build-win
+      
+      - name: Zip Binary
+        shell: pwsh
+        run: Compress-Archive "bin/wsui.exe" "wsui_win.zip" && mv wsui_win.zip bin/
+
+      - name: Upload Win Bin
+        uses: djn24/add-asset-to-release@v1
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+          path: 'bin/wsui_win.zip'    
