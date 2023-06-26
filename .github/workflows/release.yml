@@ -79,3 +79,31 @@ jobs:
         with:
           token: ${{secrets.GITHUB_TOKEN}}
           path: 'bin/wsui_win.zip'    
+          
+  publish-binaries-mac:
+    timeout-minutes: 20
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20.1'        
+
+      - name: Install FyneCLi tool
+        run: go install fyne.io/fyne/v2/cmd/fyne@latest
+
+      - name: Build
+        run: make build-mac
+      
+      - name: Zip App
+        run: zip -vr wsui_macos.zip bin/wsui.app -x "*.DS_Store" && mv wsui_macos.zip bin/
+
+      - name: Upload MacOS Bin
+        uses: djn24/add-asset-to-release@v1
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+          path: 'bin/wsui_macos.zip'          
