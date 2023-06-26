@@ -33,6 +33,9 @@ jobs:
         platform: x64      
       if: ${{ runner.os == 'Linux' }} 
       
+    - name: Setup Fyne
+      run: go install fyne.io/fyne/v2/cmd/fyne@latest
+      
     - name: Release
       uses: wangyoucao577/go-release-action@v1.30
       with:
@@ -41,3 +44,4 @@ jobs:
         goarch: ${{ matrix.goarch }}
         goversion: "https://dl.google.com/go/go1.18.1.linux-amd64.tar.gz"
         binary_name: "wsui"
+        build_command: "fyne package -os ${{matrix.goos}}"
