@@ -66,7 +66,9 @@ func (ui *WSUI) MakeUI(win *fyne.Window, storedBookmarks []model.Bookmark) fyne.
 	}
 	ui.messageContainer = container.NewVBox()
 	ui.messageScoll = container.NewScroll(ui.messageContainer)
-	ui.messageEntry = NewMessageInput()
+	ui.messageEntry = NewMessageInput(func(text string) {
+		ui.sendHandler(text)
+	})
 	ui.filter = widget.NewEntry()
 	ui.filter.OnChanged = ui.SearchConnections
 	ui.connectButton = widget.NewButton("Connect", func() {

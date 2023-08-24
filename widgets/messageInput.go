@@ -5,16 +5,20 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+type OnEnter func(string)
+
 type MessageInput struct {
 	widget.Entry
 	lastInput string
+	onEnter   OnEnter
 }
 
-func NewMessageInput() *MessageInput {
+func NewMessageInput(callback func(string)) *MessageInput {
 	entry := &MessageInput{}
 	entry.ExtendBaseWidget(entry)
 	entry.Wrapping = fyne.TextTruncate
 	entry.MultiLine = true
+	entry.onEnter = callback
 	return entry
 }
 
@@ -32,5 +36,8 @@ func (e *MessageInput) TypedKey(key *fyne.KeyEvent) {
 			e.SetText(e.Text[:len(e.Text)-1])
 		}
 
+	}
+	if key.Name == fyne.KeyReturn || key.Name == fyne.KeyEnter {
+		e.onEnter(e.Text)
 	}
 }
