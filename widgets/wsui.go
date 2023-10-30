@@ -34,6 +34,7 @@ type WSUI struct {
 	newConnForm       *BookmarkForm
 	newConnModal      *widget.PopUp
 	alertPopup        *Alert
+	tabs              *container.AppTabs
 }
 
 func (ui *WSUI) MakeUI(win *fyne.Window, storedBookmarks []model.Bookmark) fyne.CanvasObject {
@@ -89,12 +90,12 @@ func (ui *WSUI) MakeUI(win *fyne.Window, storedBookmarks []model.Bookmark) fyne.
 	ui.alertPopup = &Alert{}
 	ui.alertPopup.makeAlert(win)
 
-	tabs := container.NewAppTabs(
+	ui.tabs = container.NewAppTabs(
 		container.NewTabItem("Messages", container.NewVSplit(ui.messageScoll, container.NewBorder(nil, ui.sendButton, nil, nil, ui.messageEntry))),
 		container.NewTabItem("Options", ui.optionsForm.Init(ui.setOptions)),
 	)
 
-	return container.NewBorder(nil, nil, container.NewBorder(container.NewVBox(container.NewHBox(widget.NewLabel("Connection Bookmarks"), ui.newConnButton, ui.delConnButton), ui.filter), ui.connectButton, nil, nil, container.NewScroll(ui.connectionList)), nil, tabs)
+	return container.NewBorder(nil, nil, container.NewBorder(container.NewVBox(container.NewHBox(widget.NewLabel("Connection Bookmarks"), ui.newConnButton, ui.delConnButton), ui.filter), ui.connectButton, nil, nil, container.NewScroll(ui.connectionList)), nil, ui.tabs)
 }
 
 func (ui *WSUI) setOptions(newOpts model.Options) {
@@ -214,6 +215,7 @@ func (ui *WSUI) handleConnect() {
 		ui.connectButton.Refresh()
 		ui.sendButton.Enable()
 		ui.optionsForm.Disable()
+		ui.tabs.SelectTabIndex(0)
 	}
 }
 
