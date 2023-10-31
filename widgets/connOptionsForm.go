@@ -23,14 +23,12 @@ func (cof *ConnOptionsForm) Init(callback func(model.Options)) *widget.Form {
 		Items: []*widget.FormItem{
 			{Text: "Send As", Widget: cof.sendAs},
 			{Text: "Consume As", Widget: cof.consumeAs},
-			{Text: "Origin Header", Widget: cof.originHeader},
 		},
 		OnSubmit: func() {
 			log.Println("choices change")
 			callback(model.Options{
-				SendAs:       model.ValueFromString(cof.sendAs.Selected),
-				ConsumeAs:    model.ValueFromString(cof.consumeAs.Selected),
-				OriginHeader: cof.originHeader.Text,
+				SendAs:    model.ValueFromString(cof.sendAs.Selected),
+				ConsumeAs: model.ValueFromString(cof.consumeAs.Selected),
 			})
 		},
 	}

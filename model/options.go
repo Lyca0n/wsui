@@ -3,9 +3,8 @@ package model
 import "sort"
 
 type Options struct {
-	OriginHeader string         `json:"Origin-Header"`
-	SendAs       ContentOptions `json:"Send-Content-As"`
-	ConsumeAs    ContentOptions `json:"Get-Content-As"`
+	SendAs    ContentOptions `json:"Send-Content-As"`
+	ConsumeAs ContentOptions `json:"Get-Content-As"`
 }
 
 func DefaultOpts() *Options {

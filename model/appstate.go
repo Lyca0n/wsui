@@ -10,6 +10,7 @@ type AppState struct {
 	Connection     *websocket.Conn
 	SelectedServer *Bookmark
 	AppOptions     *Options
+	Headers        []HeaderOption
 }
 
 func InitAppState() *AppState {
@@ -17,7 +18,11 @@ func InitAppState() *AppState {
 	initState.ConnectionList = []Bookmark{}
 	initState.Messages = []string{}
 	initState.AppOptions = DefaultOpts()
-
+	initState.Headers = []HeaderOption{{
+		Enabled: false,
+		Name:    "Origin",
+		Value:   "http://localhost",
+	}}
 	return initState
 }
 

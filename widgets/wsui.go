@@ -35,6 +35,7 @@ type WSUI struct {
 	newConnModal      *widget.PopUp
 	alertPopup        *Alert
 	tabs              *container.AppTabs
+	headers           *HeaderListWidget
 }
 
 func (ui *WSUI) MakeUI(win *fyne.Window, storedBookmarks []model.Bookmark) fyne.CanvasObject {
@@ -92,7 +93,7 @@ func (ui *WSUI) MakeUI(win *fyne.Window, storedBookmarks []model.Bookmark) fyne.
 
 	ui.tabs = container.NewAppTabs(
 		container.NewTabItem("Messages", container.NewVSplit(ui.messageScoll, container.NewBorder(nil, ui.sendButton, nil, nil, ui.messageEntry))),
-		container.NewTabItem("Options", ui.optionsForm.Init(ui.setOptions)),
+		container.NewTabItem("Options", container.NewVBox(widget.NewLabel("Content Options"), ui.optionsForm.Init(ui.setOptions), widget.NewLabel("Headers"), ui.headers.Init(&ui.appState.Headers))),
 	)
 
 	return container.NewBorder(nil, nil, container.NewBorder(container.NewVBox(container.NewHBox(widget.NewLabel("Connection Bookmarks"), ui.newConnButton, ui.delConnButton), ui.filter), ui.connectButton, nil, nil, container.NewScroll(ui.connectionList)), nil, ui.tabs)
@@ -198,7 +199,7 @@ func (ui *WSUI) handleConnect() {
 
 	signal.Notify(interrupt, os.Interrupt) // Notify the interrupt channel for SIGINT
 	headers := http.Header{}
-	headers.Set("Origin", ui.appState.AppOptions.OriginHeader)
+	//to do set headers
 	conn, _, err := websocket.DefaultDialer.Dial(ui.appState.SelectedServer.Url.String(), headers)
 
 	if err != nil {
